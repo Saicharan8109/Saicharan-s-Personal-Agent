@@ -40,30 +40,62 @@ const App: React.FC = () => {
     // Cancel any current speech
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    const voices = window.speechSynthesis.getVoices();
-    
-    // Priority list for Male voices
-    const maleVoice = voices.find(v => 
-      v.name.includes('Google US English Male') || 
-      v.name.includes('Microsoft David') || // Common Windows Male Voice
-      v.name.includes('Daniel') || // Common macOS Male Voice
+    // Clean text for speech: 
+    // 1. Remove markdown symbols (*, #, `)
+    // 2. Remove links but keep text [text](url) -> text
+    // 3. Remove raw URLs
+    const speechText = text
+      .replace(/[*#_`]/g, '')               // Remove markdown chars
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Keep link text, remove URL
+      .replace(/https?:\/\/\S+/g, '')       // Remove raw URLs
+      .trim();
+
+    const utterance = new SpeechSynthesisUtterance(speechText);
+    // Ensure voices are loaded (sometimes necessary for Chrome)
+    let voices = window.speechSynthesis.getVoices();
+
+    // Priority list to approximate "en-IN-Wavenet-B" (Indian Male) or high quality male
+    const preferredVoice = voices.find(v => 
+      // 1. Specific Indian Male voices (OS dependent)
+      v.name.includes('Rishi') ||  // macOS Indian Male
+      v.name.includes('Ravi') ||   // Windows Indian Male
+      v.name.includes('Probhat') || // ChromeOS
+      (v.lang === 'en-IN' && v.name.toLowerCase().includes('male')) ||
+
+      // 2. "Natural" male voices (Edge/Cloud) - often high quality
+      (v.name.includes('Natural') && v.name.includes('Male')) ||
+      v.name.includes('Microsoft Guy') || 
+
+      // 3. Fallback to standard high-quality US voices if Indian isn't available
+      v.name === 'Google US English' || 
+      v.name.includes('Daniel') || // macOS UK Male
+      v.name.includes('Microsoft David') || // Windows US Male
+      
+      // 4. Generic fallback
       (v.name.toLowerCase().includes('male') && v.lang.startsWith('en'))
     );
 
-    // Fallback to generic English
-    const genericEnglish = voices.find(v => v.name.includes('Google US English') || v.name.includes('English United States'));
+    // Fallback if no specific male voice is found
+    const genericEnglish = voices.find(v => v.lang === 'en-US' || v.lang === 'en-GB');
 
-    if (maleVoice) {
-      utterance.voice = maleVoice;
-      utterance.pitch = 1.0;
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+      // Adjust pitch based on voice type
+      if (preferredVoice.name === 'Google US English') {
+        utterance.pitch = 0.9;
+      } else if (preferredVoice.lang === 'en-IN') {
+        // Indian voices usually sound good at normal pitch
+        utterance.pitch = 1.0; 
+      } else {
+        utterance.pitch = 1.0;
+      }
     } else if (genericEnglish) {
       utterance.voice = genericEnglish;
-      // Lower the pitch slightly to sound more masculine if a dedicated male voice isn't found
       utterance.pitch = 0.85; 
     }
     
-    utterance.rate = 1.0;
+    // SPEED: Fast reading as requested
+    utterance.rate = 1.65;
     
     window.speechSynthesis.speak(utterance);
   };

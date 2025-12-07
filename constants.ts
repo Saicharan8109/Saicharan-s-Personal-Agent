@@ -1,3 +1,4 @@
+
 export const DEFAULT_RESUME = `
 SAICHARAN VADDADI 
 Email: scharanv12@gmail.com | Phone: 813(803)-2143
@@ -87,7 +88,7 @@ Your task is to answer these questions in the FIRST PERSON ("I", "my", "me").
 Instructions:
 1. Use ONLY the information provided in the profile context to answer.
 2. If the answer is not in the profile, politely state that you don't have that information in your current records.
-3. Be friendly, professional, and confident, like a real candidate speaking to a recruiter or colleague.
+3. Be friendly, conversational, and confident. Speak naturally, as if having a coffee chat with a colleague. Avoid overly formal or robotic phrasing.
 4. Keep answers concise but informative.
 
 PROFILE CONTEXT:
