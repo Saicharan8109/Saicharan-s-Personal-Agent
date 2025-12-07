@@ -10,6 +10,7 @@ const App: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [sendingState, setSendingState] = useState<SendingState>(SendingState.IDLE);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom
@@ -20,6 +21,24 @@ const App: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Load voices - Critical for Mobile support
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        setAvailableVoices(voices);
+      }
+    };
+
+    loadVoices();
+    // Chrome/Android/iOS require this event to populate voices
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    
+    return () => {
+      window.speechSynthesis.onvoiceschanged = null;
+    };
+  }, []);
 
   // Initial welcome message
   useEffect(() => {
@@ -37,65 +56,73 @@ const App: React.FC = () => {
   const speakText = (text: string) => {
     if (!isAudioEnabled) return;
     
-    // Cancel any current speech
     window.speechSynthesis.cancel();
 
-    // Clean text for speech: 
-    // 1. Remove markdown symbols (*, #, `)
-    // 2. Remove links but keep text [text](url) -> text
-    // 3. Remove raw URLs
+    // Clean text for speech
     const speechText = text
-      .replace(/[*#_`]/g, '')               // Remove markdown chars
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Keep link text, remove URL
-      .replace(/https?:\/\/\S+/g, '')       // Remove raw URLs
+      .replace(/[*#_`]/g, '')               
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') 
+      .replace(/https?:\/\/\S+/g, '')       
       .trim();
 
     const utterance = new SpeechSynthesisUtterance(speechText);
-    // Ensure voices are loaded (sometimes necessary for Chrome)
-    let voices = window.speechSynthesis.getVoices();
+    
+    // Use loaded voices or try getting them again
+    const voices = availableVoices.length > 0 ? availableVoices : window.speechSynthesis.getVoices();
 
-    // Priority list to approximate "en-IN-Wavenet-B" (Indian Male) or high quality male
-    const preferredVoice = voices.find(v => 
-      // 1. Specific Indian Male voices (OS dependent)
-      v.name.includes('Rishi') ||  // macOS Indian Male
-      v.name.includes('Ravi') ||   // Windows Indian Male
-      v.name.includes('Probhat') || // ChromeOS
-      (v.lang === 'en-IN' && v.name.toLowerCase().includes('male')) ||
-
-      // 2. "Natural" male voices (Edge/Cloud) - often high quality
-      (v.name.includes('Natural') && v.name.includes('Male')) ||
-      v.name.includes('Microsoft Guy') || 
-
-      // 3. Fallback to standard high-quality US voices if Indian isn't available
-      v.name === 'Google US English' || 
-      v.name.includes('Daniel') || // macOS UK Male
-      v.name.includes('Microsoft David') || // Windows US Male
-      
-      // 4. Generic fallback
-      (v.name.toLowerCase().includes('male') && v.lang.startsWith('en'))
+    // --- Voice Selection Strategy for Mobile ---
+    
+    // 1. Exact "Indian Male" Matches (Best Quality)
+    // "Rishi" is the premium Indian Male voice on iOS
+    // "Ravi" is often on Windows
+    const indianMale = voices.find(v => 
+      v.name.includes('Rishi') || 
+      v.name.includes('Ravi')
     );
 
-    // Fallback if no specific male voice is found
-    const genericEnglish = voices.find(v => v.lang === 'en-US' || v.lang === 'en-GB');
+    // 2. High Quality Standard Males (Fallbacks)
+    // "Daniel" is the standard high-quality male on iOS
+    // "Martin" is common on Android/Windows
+    const standardMale = voices.find(v => 
+      v.name.includes('Daniel') || 
+      v.name.includes('Martin') || 
+      v.name.includes('David') ||
+      (v.name.includes('Google') && v.name.includes('Male'))
+    );
 
-    if (preferredVoice) {
-      utterance.voice = preferredVoice;
-      // Adjust pitch based on voice type
-      if (preferredVoice.name === 'Google US English') {
-        utterance.pitch = 0.9;
-      } else if (preferredVoice.lang === 'en-IN') {
-        // Indian voices usually sound good at normal pitch
-        utterance.pitch = 1.0; 
-      } else {
-        utterance.pitch = 1.0;
-      }
-    } else if (genericEnglish) {
-      utterance.voice = genericEnglish;
-      utterance.pitch = 0.85; 
+    // 3. Generic Male Search
+    const anyMale = voices.find(v => 
+      v.name.toLowerCase().includes('male')
+    );
+
+    // 4. Indian Locale (Often female by default, but better accent)
+    const indianGeneric = voices.find(v => v.lang === 'en-IN');
+
+    // Selection Priority
+    const selectedVoice = indianMale || standardMale || anyMale || indianGeneric || null;
+
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
     }
+
+    // --- Pitch & Rate Tuning ---
     
-    // SPEED: Fast reading as requested
-    utterance.rate = 1.65;
+    utterance.rate = 1.40; // Fast reading as requested
+
+    if (selectedVoice) {
+      // If we found a known male voice, keep pitch natural
+      if (['Rishi', 'Ravi', 'Daniel', 'Martin', 'David'].some(n => selectedVoice.name.includes(n)) || selectedVoice.name.toLowerCase().includes('male')) {
+        utterance.pitch = 1.0;
+      } else {
+        // If we fell back to a generic voice (like 'English India' which is often female on Android),
+        // we artificially lower the pitch to sound male.
+        utterance.pitch = 0.7; 
+      }
+    } else {
+      // Absolute fallback (Device default) - usually female on mobile
+      // Force deep pitch to simulate male
+      utterance.pitch = 0.7;
+    }
     
     window.speechSynthesis.speak(utterance);
   };
