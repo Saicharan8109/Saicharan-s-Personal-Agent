@@ -107,7 +107,7 @@ const App: React.FC = () => {
 
     // --- Pitch & Rate Tuning ---
     
-    utterance.rate = 1.40; // Fast reading as requested
+    utterance.rate = 1.15; // Fast reading as requested
 
     if (selectedVoice) {
       // If we found a known male voice, keep pitch natural
