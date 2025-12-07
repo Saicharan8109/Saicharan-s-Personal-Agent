@@ -1,0 +1,7 @@
+{
+  "name": "Saicharan's AI Agent",
+  "description": "An AI-powered assistant representing Saicharan Vaddadi.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
