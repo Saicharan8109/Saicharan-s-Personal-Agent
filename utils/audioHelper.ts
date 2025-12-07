@@ -15,7 +15,7 @@ export const blobToBase64 = (blob: Blob): Promise<string> => {
   });
 };
 
-export const createWavBlob = (audioData: Float32Array, sampleRate: number): Blob => {
+export const createWavBlob = (audioData: Float32Array): Blob => {
   // Simple WAV encoder could go here if raw PCM is needed, 
   // but for this app we will use the MediaRecorder's native output (webm/mp4)
   // which Gemini supports directly.
