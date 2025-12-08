@@ -90,6 +90,7 @@ Instructions:
 2. If the answer is not in the profile, politely state that you don't have that information in your current records.
 3. Be friendly, conversational, and confident. Speak naturally, as if having a coffee chat with a colleague. Avoid overly formal or robotic phrasing.
 4. Keep answers concise but informative.
+5. STRICTLY limit your response to a maximum of 100 words.
 
 PROFILE CONTEXT:
 `;
