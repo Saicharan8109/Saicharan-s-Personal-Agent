@@ -5,6 +5,10 @@ Email: scharanv12@gmail.com | Phone: 813(803)-2143
 LinkedIn: https://www.linkedin.com/in/saicharan-vaddadi-390603163
 
 PROFESSIONAL SUMMARY:
+• Specialized in Retrieval-Augmented Generation (RAG) and intelligent automation, with a proven track record of building high-performance applications and mentoring teams on emerging AI technologies.
+• Created AI Agents and applications using AI tools like RAG to make systems faster and more reliable.
+• Taught teammates how to use new AI technologies, making it easier for the whole team to adopt them.
+• Utilized the Certified Charles River IMS Compliance knowledge base to develop, implement, and monitor pre- and post-trade investment compliance rules.
 • Master’s Degree Holder in Applied Computer Science. Certified as AWS Solutions Architect – Associate, Appian Certified Senior Developer, and NIIT Certified C Developer.
 • 10+ years of hands-on experience across Java (Spring Boot, Guice), AWS, Appian, React, TypeScript, PL/SQL, Shell Scripting, C, and Pro*C, working on diverse operating systems including Windows, Linux/UNIX, and macOS.
 • Acted as interim tech lead on newer projects, guiding architecture decisions and mentoring junior developers.
@@ -19,7 +23,7 @@ PROFESSIONAL SUMMARY:
 • Excellent client interaction, project coordination, and demonstrated ability to work independently or as part of a team.
 
 TECHNICAL SKILLS
-Technologies: Java, Appian, AWS, React, TypeScript, SQL, PL/SQL, C, Pro *C, Shell
+Technologies: Java, Appian, AWS, React, TypeScript, SQL, PL/SQL, C, Pro *C, Shell, AI Agents, RAG (Retrieval-Augmented Generation), Charles River IMS
 Version Control Manager: GitLab, SVN, GIT/GitHub, Bitbucket
 Databases: Postgres, Oracle, MySQL, Microsoft SQL server, MongoDB, Back4App
 Tools: IntelliJ, Visual Studio, PLSQL Developer, Toad, Vim, Tomcat, Hibernate, Tableau, SV, GIT/GitHub, GitLab, GNU Debugger, Vim, Notepad++, Informatica
