@@ -46,7 +46,7 @@ const App: React.FC = () => {
       {
         id: 'welcome',
         role: 'model',
-        text: "Hello! I am Saicharan's AI Agent. I can answer any questions about my experience, skills, and background. What would you like to know?",
+        text: "Hello! I am Saicharan's AI Agent. I can answer any questions about his experience, skills, and background. What would you like to know?",
         timestamp: Date.now()
       }
     ]);
