@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Linkedin, Mail, Sparkles, Phone, Volume2, VolumeX, Info, X, ExternalLink } from 'lucide-react';
+import { Linkedin, Mail, Sparkles, Phone, Volume2, VolumeX, Info, X, ExternalLink, Bot } from 'lucide-react';
 import { Message, SendingState } from './types';
 import { DEFAULT_RESUME, PROFILE_IMAGE_URL } from './constants';
 import { sendMessageToGemini } from './services/geminiService';
@@ -17,6 +17,7 @@ const App: React.FC = () => {
 
   // Use the raw profile image URL from constants
   const finalImageUrl = PROFILE_IMAGE_URL;
+  const fallbackImageUrl = "https://ui-avatars.com/api/?name=Saicharan+Vaddadi&background=4f46e5&color=fff&size=512";
 
   // Auto-scroll to bottom
   const scrollToBottom = () => {
@@ -110,6 +111,13 @@ const App: React.FC = () => {
     speakText(responseText);
   };
 
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const img = e.target as HTMLImageElement;
+    if (img.src !== fallbackImageUrl) {
+      img.src = fallbackImageUrl;
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500/30 overflow-hidden">
       
@@ -124,22 +132,27 @@ const App: React.FC = () => {
                 <img 
                   src={finalImageUrl} 
                   alt="Saicharan Vaddadi" 
-                  onLoad={() => console.log("Header image loaded successfully")}
-                  onError={(e) => {
-                    console.error("Profile image failed to load at path:", finalImageUrl);
-                    (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=Saicharan+Vaddadi&background=4f46e5&color=fff&size=256`;
-                  }}
+                  onError={handleImageError}
                   className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover object-top border-2 border-slate-900 shadow-xl bg-slate-800"
                   style={{ imageRendering: 'auto' }}
                 />
+                <div className="absolute -bottom-1 -right-1 bg-indigo-600 rounded-full p-1 border-2 border-slate-900">
+                  <Bot size={12} className="text-white" />
+                </div>
               </div>
               <div>
-                <h1 className="font-bold text-lg sm:text-2xl tracking-tight text-white leading-none">Saicharan Vaddadi</h1>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="font-bold text-lg sm:text-2xl tracking-tight text-white leading-none">Saicharan Vaddadi</h1>
+                  <div className="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center gap-1.5 backdrop-blur-sm">
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></div>
+                    <span className="text-[10px] font-bold text-indigo-300 uppercase tracking-wider">AI Agent</span>
+                  </div>
+                </div>
                 <div className="flex items-center gap-2 mt-1.5">
-                   <span className="text-xs sm:text-sm font-medium text-indigo-400">Sr. Software Engineer</span>
+                   <span className="text-xs sm:text-sm font-medium text-slate-400">Sr. Software Engineer</span>
                    <button 
                      onClick={() => setIsSidebarOpen(true)}
-                     className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-slate-400 hover:text-white bg-slate-800/50 px-2 py-0.5 rounded-full border border-slate-700/50 transition-colors"
+                     className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20 transition-colors"
                    >
                      <Info size={12} /> Bio
                    </button>
@@ -216,7 +229,7 @@ const App: React.FC = () => {
 
         {/* Desktop Sidebar */}
         <aside className="hidden lg:block w-80 border-l border-slate-800 bg-slate-900/30 p-0 overflow-y-auto">
-          <ProfileContent finalImageUrl={finalImageUrl} />
+          <ProfileContent finalImageUrl={finalImageUrl} handleImageError={handleImageError} fallbackImageUrl={fallbackImageUrl} />
         </aside>
       </div>
 
@@ -232,7 +245,7 @@ const App: React.FC = () => {
               >
                 <X size={24} />
               </button>
-              <ProfileContent finalImageUrl={finalImageUrl} />
+              <ProfileContent finalImageUrl={finalImageUrl} handleImageError={handleImageError} fallbackImageUrl={fallbackImageUrl} />
             </div>
           </div>
         </div>
@@ -243,19 +256,22 @@ const App: React.FC = () => {
 };
 
 // Extracted Profile Content for reuse
-const ProfileContent = ({ finalImageUrl }: { finalImageUrl: string }) => (
+interface ProfileContentProps {
+  finalImageUrl: string;
+  handleImageError: (e: React.SyntheticEvent<HTMLImageElement, Event>) => void;
+  fallbackImageUrl: string;
+}
+
+const ProfileContent = ({ finalImageUrl, handleImageError, fallbackImageUrl }: ProfileContentProps) => (
   <div className="flex flex-col h-full">
     {/* High Resolution Image Container */}
     <div className="relative aspect-[4/5] w-full bg-slate-800 overflow-hidden shrink-0">
       <img 
         src={finalImageUrl} 
         alt="Saicharan Vaddadi" 
+        onError={handleImageError}
         className="w-full h-full object-cover object-top"
         style={{ imageRendering: 'auto' }}
-        onLoad={() => console.log("Sidebar image loaded successfully")}
-        onError={(e) => {
-          (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=Saicharan+Vaddadi&background=4f46e5&color=fff&size=512`;
-        }}
       />
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
       <div className="absolute bottom-6 left-6 right-6">
