@@ -229,7 +229,7 @@ const App: React.FC = () => {
 
         {/* Desktop Sidebar */}
         <aside className="hidden lg:block w-80 border-l border-slate-800 bg-slate-900/30 p-0 overflow-y-auto">
-          <ProfileContent finalImageUrl={finalImageUrl} handleImageError={handleImageError} fallbackImageUrl={fallbackImageUrl} />
+          <ProfileContent finalImageUrl={finalImageUrl} handleImageError={handleImageError} />
         </aside>
       </div>
 
@@ -245,7 +245,7 @@ const App: React.FC = () => {
               >
                 <X size={24} />
               </button>
-              <ProfileContent finalImageUrl={finalImageUrl} handleImageError={handleImageError} fallbackImageUrl={fallbackImageUrl} />
+              <ProfileContent finalImageUrl={finalImageUrl} handleImageError={handleImageError} />
             </div>
           </div>
         </div>
@@ -259,10 +259,9 @@ const App: React.FC = () => {
 interface ProfileContentProps {
   finalImageUrl: string;
   handleImageError: (e: React.SyntheticEvent<HTMLImageElement, Event>) => void;
-  fallbackImageUrl: string;
 }
 
-const ProfileContent = ({ finalImageUrl, handleImageError, fallbackImageUrl }: ProfileContentProps) => (
+const ProfileContent = ({ finalImageUrl, handleImageError }: ProfileContentProps) => (
   <div className="flex flex-col h-full">
     {/* High Resolution Image Container */}
     <div className="relative aspect-[4/5] w-full bg-slate-800 overflow-hidden shrink-0">
