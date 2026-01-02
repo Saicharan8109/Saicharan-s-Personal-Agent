@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Chat } from "@google/genai";
 import { SYSTEM_INSTRUCTION_TEMPLATE } from "../constants";
 import { blobToBase64 } from "../utils/audioHelper";
@@ -30,7 +31,7 @@ const getChatSession = (resumeContent: string): Chat => {
   if (!chatSession) {
     const systemInstruction = `${SYSTEM_INSTRUCTION_TEMPLATE}\n${resumeContent}`;
     chatSession = client.chats.create({
-      model: "gemini-2.5-flash",
+      model: "gemini-3-flash-preview",
       config: {
         systemInstruction: systemInstruction,
         temperature: 0.7,
@@ -51,9 +52,8 @@ export const sendMessageToGemini = async (
     if (input instanceof Blob) {
       // Handle Audio Input
       const base64Audio = await blobToBase64(input);
-      const mimeType = input.type || 'audio/webm'; // Default to webm if unknown, mostly safe for MediaRecorder
+      const mimeType = input.type || 'audio/webm';
       
-      // We pass the audio as an inline data part within the 'message' property
       result = await session.sendMessage({
         message: [
           {
