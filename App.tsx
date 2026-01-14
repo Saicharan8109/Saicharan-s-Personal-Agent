@@ -119,10 +119,10 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500/30 overflow-hidden">
+    <div className="flex flex-col h-[100dvh] bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500/30 overflow-hidden">
       
       {/* Header */}
-      <header className="flex-none bg-slate-900/80 backdrop-blur-md border-b border-slate-800 z-30 sticky top-0 shadow-sm">
+      <header className="flex-none bg-slate-900/80 backdrop-blur-md border-b border-slate-800 z-30 sticky top-0 shadow-sm pt-[env(safe-area-inset-top)]">
         <div className="max-w-5xl mx-auto px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between gap-4">
             
@@ -238,7 +238,7 @@ const App: React.FC = () => {
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)}></div>
           <div className="absolute right-0 top-0 h-full w-full max-w-sm bg-slate-900 border-l border-slate-700 shadow-2xl animate-in slide-in-from-right duration-300">
-            <div className="h-full overflow-y-auto relative">
+            <div className="h-full overflow-y-auto relative pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
               <button 
                 onClick={() => setIsSidebarOpen(false)}
                 className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 backdrop-blur-md transition-all"

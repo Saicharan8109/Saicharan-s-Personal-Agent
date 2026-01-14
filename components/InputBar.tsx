@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Mic, Square, Loader2 } from 'lucide-react';
 import { SendingState } from '../types';
@@ -74,7 +75,7 @@ const InputBar: React.FC<InputBarProps> = ({ onSendText, onSendAudio, sendingSta
   const isLoading = sendingState === SendingState.PROCESSING;
 
   return (
-    <div className="w-full bg-slate-900 border-t border-slate-800 p-4 sticky bottom-0 z-20">
+    <div className="w-full bg-slate-900 border-t border-slate-800 p-4 sticky bottom-0 z-20 pb-[calc(1rem+env(safe-area-inset-bottom))]">
       <div className="max-w-3xl mx-auto flex items-end gap-3">
         
         {/* Input Field */}
