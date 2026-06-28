@@ -26,7 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let session = sessions.get(sessionId);
     if (!session) {
       session = ai.chats.create({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.5-flash",
         config: {
           systemInstruction: systemInstruction + "\n" + resumeContent,
           temperature: 0.7,
