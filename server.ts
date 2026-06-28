@@ -9,7 +9,11 @@ const PORT = 3000;
 app.use(express.json({ limit: '50mb' }));
 
 // Initialize GoogleGenAI server-side
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || process.env.GEMINI_API_KEY });
+const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+if (!apiKey) {
+  console.warn("WARNING: Gemini API key is missing. Please set GEMINI_API_KEY in your environment variables.");
+}
+const ai = new GoogleGenAI({ apiKey: apiKey || 'missing-key' });
 
 // Basic in-memory session store
 const sessions = new Map<string, Chat>();
@@ -57,8 +61,10 @@ app.post('/api/chat', async (req, res) => {
     
     res.json({ text: result.text || "I couldn't generate a response." });
   } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: err.message || "An error occurred" });
+    const errorMessage = err.message || "";
+    const sanitizedMessage = errorMessage.replace(/api_key:[\w-]+/g, 'api_key:[REDACTED]');
+    console.error("Chat API Error:", sanitizedMessage);
+    res.status(500).json({ error: "An error occurred while communicating with the AI service." });
   }
 });
 
