@@ -3,5 +3,6 @@
   "description": "An AI-powered assistant representing Saicharan Vaddadi.",
   "requestFramePermissions": [
     "microphone"
-  ]
+  ],
+  "majorCapabilities": []
 }

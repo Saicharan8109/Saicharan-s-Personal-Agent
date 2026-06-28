@@ -1,44 +1,13 @@
 
-import { GoogleGenAI, Chat } from "@google/genai";
 import { SYSTEM_INSTRUCTION_TEMPLATE } from "../constants";
 import { blobToBase64 } from "../utils/audioHelper";
 
-let client: GoogleGenAI | null = null;
-let chatSession: Chat | null = null;
-
-// Initialize the API client
-const initializeClient = () => {
-  if (!client) {
-    const apiKey = process.env.API_KEY;
-    if (!apiKey) {
-      console.error("API_KEY is missing from environment variables");
-      return;
-    }
-    client = new GoogleGenAI({ apiKey });
-  }
-};
+// We generate a simple session ID for the current user's session
+let currentSessionId = Math.random().toString(36).substring(2, 15);
 
 // Reset chat session (e.g., when resume changes)
 export const resetChatSession = () => {
-  chatSession = null;
-};
-
-// Get or create a chat session with the specific resume context
-const getChatSession = (resumeContent: string): Chat => {
-  initializeClient();
-  if (!client) throw new Error("Client not initialized");
-
-  if (!chatSession) {
-    const systemInstruction = `${SYSTEM_INSTRUCTION_TEMPLATE}\n${resumeContent}`;
-    chatSession = client.chats.create({
-      model: "gemini-3-flash-preview",
-      config: {
-        systemInstruction: systemInstruction,
-        temperature: 0.7,
-      },
-    });
-  }
-  return chatSession;
+  currentSessionId = Math.random().toString(36).substring(2, 15);
 };
 
 export const sendMessageToGemini = async (
@@ -46,37 +15,38 @@ export const sendMessageToGemini = async (
   input: string | Blob
 ): Promise<string> => {
   try {
-    const session = getChatSession(resumeContent);
-    let result;
+    let payload: any = {
+      sessionId: currentSessionId,
+      resumeContent,
+      systemInstruction: SYSTEM_INSTRUCTION_TEMPLATE,
+      isAudio: false,
+    };
 
     if (input instanceof Blob) {
       // Handle Audio Input
-      const base64Audio = await blobToBase64(input);
-      const mimeType = input.type || 'audio/webm';
-      
-      result = await session.sendMessage({
-        message: [
-          {
-            inlineData: {
-              mimeType: mimeType,
-              data: base64Audio
-            }
-          },
-          {
-            text: "Please answer the question spoken in this audio based on the profile context."
-          }
-        ]
-      });
+      payload.isAudio = true;
+      payload.mimeType = input.type || 'audio/webm';
+      payload.input = await blobToBase64(input);
     } else {
-      // Handle Text Input
-      result = await session.sendMessage({
-        message: input
-      });
+      payload.input = input;
     }
 
-    return result.text || "I couldn't generate a response.";
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await response.json();
+    return data.text || "I couldn't generate a response.";
   } catch (error) {
-    console.error("Error communicating with Gemini:", error);
+    console.error("Error communicating with backend:", error);
     return "Sorry, I encountered an error processing your request. Please try again.";
   }
 };
